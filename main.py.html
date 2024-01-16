@@ -1,0 +1,61 @@
+<html>
+<head>
+<title>main.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #6aab73;}
+.s4 { color: #2aacb8;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+main.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">telebot</span>
+<span class="s0">from </span><span class="s1">config </span><span class="s0">import </span><span class="s1">keys</span><span class="s2">, </span><span class="s1">TOKEN</span>
+<span class="s0">from </span><span class="s1">utills </span><span class="s0">import </span><span class="s1">ConvertionException</span><span class="s2">, </span><span class="s1">CryptoConverter</span>
+
+<span class="s1">bot </span><span class="s2">= </span><span class="s1">telebot</span><span class="s2">.</span><span class="s1">TeleBot</span><span class="s2">(</span><span class="s1">TOKEN</span><span class="s2">)</span>
+
+<span class="s2">@</span><span class="s1">bot</span><span class="s2">.</span><span class="s1">message_handler</span><span class="s2">(</span><span class="s1">commands</span><span class="s2">=[</span><span class="s3">&quot;start&quot;</span><span class="s2">, </span><span class="s3">&quot;help&quot;</span><span class="s2">])</span>
+<span class="s0">def </span><span class="s1">help </span><span class="s2">(</span><span class="s1">message</span><span class="s2">: </span><span class="s1">telebot</span><span class="s2">.</span><span class="s1">types</span><span class="s2">.</span><span class="s1">Message</span><span class="s2">):</span>
+    <span class="s1">text </span><span class="s2">= </span><span class="s3">'Чтобы начать работу введите комманду боту в следующем формате:</span><span class="s0">\n</span><span class="s3">&lt;имя валюты&gt; </span><span class="s0">\ 
+</span><span class="s3">&lt; в какую валюту перевести&gt; </span><span class="s0">\ 
+</span><span class="s3">&lt;количество переводимой валюты&gt;</span><span class="s0">\n</span><span class="s3">Увидеть список всех доступных валют: /values'</span>
+    <span class="s1">bot</span><span class="s2">.</span><span class="s1">reply_to</span><span class="s2">(</span><span class="s1">message</span><span class="s2">, </span><span class="s1">text</span><span class="s2">)</span>
+
+<span class="s2">@</span><span class="s1">bot</span><span class="s2">.</span><span class="s1">message_handler</span><span class="s2">(</span><span class="s1">commands</span><span class="s2">=[</span><span class="s3">'values'</span><span class="s2">])</span>
+<span class="s0">def </span><span class="s1">values</span><span class="s2">(</span><span class="s1">message</span><span class="s2">: </span><span class="s1">telebot</span><span class="s2">.</span><span class="s1">types</span><span class="s2">.</span><span class="s1">Message</span><span class="s2">):</span>
+    <span class="s1">text </span><span class="s2">= </span><span class="s3">'Доступные валюты:'</span>
+    <span class="s0">for </span><span class="s1">key </span><span class="s0">in </span><span class="s1">keys</span><span class="s2">.</span><span class="s1">keys</span><span class="s2">():</span>
+        <span class="s1">text </span><span class="s2">= </span><span class="s3">'</span><span class="s0">\n</span><span class="s3">'</span><span class="s2">.</span><span class="s1">join</span><span class="s2">((</span><span class="s1">text</span><span class="s2">, </span><span class="s1">key</span><span class="s2">,))</span>
+    <span class="s1">bot</span><span class="s2">.</span><span class="s1">reply_to</span><span class="s2">(</span><span class="s1">message</span><span class="s2">, </span><span class="s1">text</span><span class="s2">)</span>
+
+<span class="s2">@</span><span class="s1">bot</span><span class="s2">.</span><span class="s1">message_handler</span><span class="s2">(</span><span class="s1">content_types</span><span class="s2">=[</span><span class="s3">'text'</span><span class="s2">, ])</span>
+<span class="s0">def </span><span class="s1">convert</span><span class="s2">(</span><span class="s1">message</span><span class="s2">: </span><span class="s1">telebot</span><span class="s2">.</span><span class="s1">types</span><span class="s2">.</span><span class="s1">Message</span><span class="s2">):</span>
+    <span class="s0">try</span><span class="s2">:</span>
+        <span class="s1">values </span><span class="s2">= </span><span class="s1">message</span><span class="s2">.</span><span class="s1">text</span><span class="s2">.</span><span class="s1">split</span><span class="s2">(</span><span class="s3">' '</span><span class="s2">)</span>
+
+        <span class="s0">if </span><span class="s1">len</span><span class="s2">(</span><span class="s1">values</span><span class="s2">) != </span><span class="s4">3</span><span class="s2">:</span>
+            <span class="s0">raise </span><span class="s1">ConvertionException</span><span class="s2">(</span><span class="s3">'Слишком много параметров.'</span><span class="s2">)</span>
+
+        <span class="s1">quote</span><span class="s2">, </span><span class="s1">base</span><span class="s2">, </span><span class="s1">amount </span><span class="s2">= </span><span class="s1">values</span>
+        <span class="s1">total_base </span><span class="s2">= </span><span class="s1">CryptoConverter</span><span class="s2">.</span><span class="s1">convert</span><span class="s2">(</span><span class="s1">quote</span><span class="s2">, </span><span class="s1">base</span><span class="s2">, </span><span class="s1">amount</span><span class="s2">)</span>
+    <span class="s0">except </span><span class="s1">ConvertionException </span><span class="s0">as </span><span class="s1">e</span><span class="s2">:</span>
+        <span class="s1">bot</span><span class="s2">.</span><span class="s1">reply_to</span><span class="s2">(</span><span class="s1">message</span><span class="s2">,</span><span class="s3">f'Ошибка пользователя</span><span class="s0">\n{</span><span class="s1">e</span><span class="s0">}</span><span class="s3">'</span><span class="s2">)</span>
+    <span class="s0">except </span><span class="s1">Exception </span><span class="s0">as </span><span class="s1">e</span><span class="s2">:</span>
+        <span class="s1">bot</span><span class="s2">.</span><span class="s1">reply_to</span><span class="s2">(</span><span class="s1">message</span><span class="s2">, </span><span class="s3">f'Не удалось обработать команду</span><span class="s0">\n{</span><span class="s1">e</span><span class="s0">}</span><span class="s3">'</span><span class="s2">)</span>
+    <span class="s0">else</span><span class="s2">:</span>
+        <span class="s1">text </span><span class="s2">= </span><span class="s3">f'Цена </span><span class="s0">{</span><span class="s1">amount</span><span class="s0">} {</span><span class="s1">quote</span><span class="s0">} </span><span class="s3">в </span><span class="s0">{</span><span class="s1">base</span><span class="s0">} </span><span class="s3">- </span><span class="s0">{</span><span class="s1">total_base</span><span class="s0">}</span><span class="s3">'</span>
+        <span class="s1">bot</span><span class="s2">.</span><span class="s1">send_message</span><span class="s2">(</span><span class="s1">message</span><span class="s2">.</span><span class="s1">chat</span><span class="s2">.</span><span class="s1">id</span><span class="s2">, </span><span class="s1">text</span><span class="s2">)</span>
+
+
+<span class="s1">bot</span><span class="s2">.</span><span class="s1">polling</span><span class="s2">(</span><span class="s1">none_stop</span><span class="s2">=</span><span class="s0">True</span><span class="s2">)</span>
+</pre>
+</body>
+</html>
